@@ -1,8 +1,9 @@
-import express, { type Request, type Response, type Express } from "express";
+import express, { type Express } from "express";
 import { createServer } from "node:http";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { config as dotEnvConfig } from "dotenv";
+import { bugRoutes, projectRoutes, userRoutes } from "./routes";
 
 dotEnvConfig();
 
@@ -19,9 +20,9 @@ app.use(
   })
 );
 
-app.get("/", (_req: Request, res: Response) => {
-  return res.send("Test");
-});
+app.use("/api/users/", userRoutes);
+app.use("/api/projects/", projectRoutes);
+app.use("/api/bugs/", bugRoutes);
 
 httpServer.listen(PORT, () => {
   console.info(`Starting on PORT *:${PORT}`);
