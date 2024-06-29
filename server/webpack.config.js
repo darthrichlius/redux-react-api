@@ -34,11 +34,6 @@ module.exports = {
   watchOptions: {
     ignored: /node_modules/, // Ignore node_modules during watch
   },
-  /**
-   * Generate full source map (the most detailed mapping between the original source code and the compiled code)
-   * Pretty usefull in case of debugging
-   */
-  devtool: "source-map",
   plugins: [
     new NodemonPlugin({
       script: "./dist/app.js",
