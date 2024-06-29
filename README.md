@@ -3,9 +3,12 @@ A demo application showcasing how to use RTK (**Redux Toolkit**) with **React** 
 ## Getting Started
 
 **Requirements**
-- Make
-- Node 18+
-- npm
+
+- **Make**: Required to safely start the application (you can do it manually if you want)
+- **Node 18+**: This is a `vitejs` peer dependency
+- **npm**: Required to manage packages and run scripts
+- **sqlite3**: Required to process data
+- **npx**: Required to execute `prisma`
 
 **Instructions**
 
@@ -20,7 +23,7 @@ make start
 
 **HMR**
 
-Both services have HMR enabled. :)
+Both services have HMR enabled. Yeah! :)
 
 ## Project structure
 
@@ -43,7 +46,7 @@ There are 3 entities: `User`, `Project`, and `Bug`.
 
 #### Server
 
-An **ExpressJS** application written in TypeScript 
+An **ExpressJS** application written in TypeScript
 
 ## License
 

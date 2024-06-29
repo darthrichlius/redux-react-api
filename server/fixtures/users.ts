@@ -1,4 +1,6 @@
-const userData = [
+import { User } from "@/types/model";
+
+const userData: User[] = [
   {
     id: 1,
     name: "John Doe",

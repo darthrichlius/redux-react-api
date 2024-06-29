@@ -3,7 +3,8 @@ import { createServer } from "node:http";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { config as dotEnvConfig } from "dotenv";
-import { bugRoutes, projectRoutes, userRoutes } from "./routes";
+import { bugRoutes, projectRoutes, userRoutes } from "@/routes";
+import seed from "@/seed";
 
 dotEnvConfig();
 
@@ -19,6 +20,8 @@ app.use(
     origin: corsOrigin,
   })
 );
+
+seed();
 
 app.use("/api/users/", userRoutes);
 app.use("/api/projects/", projectRoutes);

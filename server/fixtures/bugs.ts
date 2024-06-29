@@ -1,4 +1,6 @@
-const bugData = [
+import { Bug } from "@/types/model";
+
+const bugData: Bug[] = [
   {
     id: 1,
     description: "The button doesn't seem to be correctly aligned on my phone",

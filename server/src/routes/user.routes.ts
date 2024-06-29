@@ -1,10 +1,11 @@
 import { type Request, type Response, Router } from "express";
-import data from "../../fixtures/users";
+import prismaClient from "@/services/prisma";
 
 const router = Router();
 
-router.get("/", (_req: Request, res: Response) => {
-  res.json(data);
+router.get("/", async (_req: Request, res: Response) => {
+  const users = await prismaClient.user.findMany();
+  res.json(users);
 });
 
 export default router;

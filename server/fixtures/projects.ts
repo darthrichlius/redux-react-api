@@ -1,4 +1,6 @@
-const projectData = [
+import { Project } from "@prisma/client";
+
+const projectData: Project[] = [
   {
     id: 1,
     name: "FilmTube",
