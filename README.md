@@ -21,6 +21,8 @@ A demo application showcasing how to use RTK (**Redux Toolkit**) with **React** 
 make start
 ```
 
+4. The script should prompt you to name a migration. Add any name and **enter**
+
 **HMR**
 
 Both services have HMR enabled. Yeah! :)
@@ -47,6 +49,15 @@ There are 3 entities: `User`, `Project`, and `Bug`.
 #### Server
 
 An **ExpressJS** application written in TypeScript
+
+## Troubleshoot
+
+#### Make script triggers an error
+
+The make script has been designed to be as idempotent as possible.
+However, some unexpected errors still arise.
+
+If you are encountering an error, **relaunch the script**, it should solve the issue.
 
 ## License
 
