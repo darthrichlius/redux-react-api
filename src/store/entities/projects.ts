@@ -1,10 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+export interface IProject {
+  id: number;
+  name: string;
+}
+
 let lastId = 0;
 
 const slice = createSlice({
   name: "projects",
-  initialState: [],
+  initialState: [] as IProject[],
   // a.k.a Action Handlers
   reducers: {
     // action => Action Handler
