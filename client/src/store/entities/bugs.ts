@@ -1,14 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createSelector } from "reselect";
-import { type IUser } from "./users";
+import { type IUser, IBug } from "@/store/types";
 import { type AppState } from "@store/configureStore";
-
-export interface IBug {
-  id: number;
-  resolved: boolean;
-  description: string;
-  user: IUser | null;
-}
 
 let lastId = 0;
 

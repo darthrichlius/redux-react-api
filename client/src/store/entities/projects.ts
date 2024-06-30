@@ -1,9 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-export interface IProject {
-  id: number;
-  name: string;
-}
+import { IProject } from "@/store/types";
 
 let lastId = 0;
 

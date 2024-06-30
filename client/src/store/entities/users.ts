@@ -1,9 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-export interface IUser {
-  id: number;
-  name: string;
-}
+import { IUser } from "@/store/types";
 
 let lastId = 0;
 
