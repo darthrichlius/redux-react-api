@@ -70,6 +70,13 @@ interface QueryOption {
  * This function, known as a thunk, can then be invoked with the dispatch function and getState function as arguments, giving you access to the Redux store's state and the ability to dispatch additional actions.
  */
 /**
+ * IMPROVEMENTS
+ * This logic should not be hard coded in a Slice
+ * We should make it available through the entire application
+ * Plus, having two methods is not a good approach neither.
+ * We should consider the following approach:
+ *  1.Default caching approach
+ *  2. Let's the developer out-out or configure the cache strategy
  */
 export const bugApiGetBugsWithCache =
   (options?: QueryOption) =>
