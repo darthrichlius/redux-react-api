@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createSelector } from "reselect";
 import { type IUser } from "./users";
-import { IState } from "../configureStore";
+import { IState } from "@store/configureStore";
 
 export interface IBug {
   id: number;

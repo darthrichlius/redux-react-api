@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
-import reducer from "./entities";
-import api from "./middleware/api.middleware";
-import logger from "./middleware/logger.middleware";
+import reducer from "@store/entities";
+import api from "@store/middleware/api.middleware";
+import logger from "@store/middleware/logger.middleware";
 
 const store = configureStore({
   reducer,

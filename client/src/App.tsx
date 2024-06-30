@@ -1,8 +1,8 @@
 import { Action } from "redux";
-import Bugs from "./components/Bugs";
-import { StoreContext } from "./context/storeContext";
-import { ApiAction } from "./store/middleware/api.middleware";
-import configureStore from "./store/configureStore";
+import Bugs from "@/components/Bugs";
+import { StoreContext } from "@/context/storeContext";
+import { ApiAction } from "@store/middleware/api.middleware";
+import configureStore from "@store/configureStore";
 
 const apiActionTest: ApiAction = {
   type: "apiRequestBegan",

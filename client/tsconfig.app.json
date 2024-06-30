@@ -21,7 +21,14 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    "paths": {
+        "@@/*": ["./*"],
+        "@/*": ["./src/*"],
+        "@src/*": ["./src/*"],
+        "@store/*": ["./src/store/*"]
+      }
   },
   "include": ["src"]
 }
