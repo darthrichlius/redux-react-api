@@ -32,10 +32,7 @@ const api: Middleware = (store) => (next) => async (action) => {
 
     const { url, method, data, onSuccess } = (action as ApiAction).payload;
     const res: AxiosResponse = await axios.request({
-      /**
-       * @todo make this data configurable
-       */
-      baseURL: "http://localhost:9001/api",
+      baseURL: import.meta.env.VITE_API_URL,
       url,
       method,
       data,
