@@ -4,7 +4,7 @@ import configureStore from "@store/configureStore";
 import { apiRequestBegan } from "@store/api";
 
 const apiActionTest = apiRequestBegan({
-  url: "/bug",
+  url: "/bugs",
   onSuccess: "api/getBugsSuccess",
   /**
    * `onError` has been removed has it can be handled by default by the API Middleware
