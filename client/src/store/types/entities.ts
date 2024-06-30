@@ -32,7 +32,7 @@ export interface QueryState {
    *  - logging
    *  - debugging
    */
-  lastFetch: number | null;
+  lastFetch: number | null; // We prefer timestamp as Javascript Date is not serializable
 }
 
 /**

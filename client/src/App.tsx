@@ -1,13 +1,22 @@
 import Bugs from "@/components/Bugs";
 import { StoreContext } from "@/context/storeContext";
 import configureStore from "@store/configureStore";
-import { bugApiGetBugs } from "./store/entities/bugs";
+import { bugApiGetBugsWithCache } from "./store/entities/bugs";
 
 const store = configureStore();
 
-const apiActionTest = bugApiGetBugs();
+store.dispatch(bugApiGetBugsWithCache());
 
-store.dispatch(apiActionTest);
+// This is just for testing
+// Should showcase how that the caching approach works
+setTimeout(() => {
+  store.dispatch(bugApiGetBugsWithCache());
+}, 2000);
+// This is just for testing
+// Should showcase how that the caching approach works
+setTimeout(() => {
+  store.dispatch(bugApiGetBugsWithCache());
+}, 61000);
 
 export default function App() {
   return (

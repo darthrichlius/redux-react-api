@@ -1,9 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createSelector } from "reselect";
+import moment from "moment";
 import type { User, Bug, BugQueryState } from "@/store/types";
-import type { AppState } from "@store/configureStore";
+import type {
+  AppDispatch,
+  AppRootState,
+  AppState,
+} from "@store/configureStore";
 import { apiRequestBegan } from "@store/api";
-import { ApiRoutes } from "@store/config/api.config";
+import { ApiCaching, ApiRoutes } from "@store/config/api.config";
 
 const API_RESOURCE_NAME = "bugs";
 let lastId = 0;
@@ -45,6 +50,7 @@ const slice = createSlice({
     bugApiGetSuccess: (bugs, action) => {
       bugs.list = action.payload;
       bugs.loading = false;
+      bugs.lastFetch = Date.now();
     },
   },
 });
@@ -53,6 +59,29 @@ export const { bugAdded, bugResolved, bugAssigned } = slice.actions;
 export default slice.reducer;
 
 // -------------------- ACTION CREATORS -------------------- //
+
+interface QueryOption {
+  cacheTTL: number; // in Minutes
+}
+
+/**
+ * As a reminder, this chaining approach is possible thanks to redux-thunk
+ * Redux Thunk allows you to return a function from an action creator instead of a plain action object.
+ * This function, known as a thunk, can then be invoked with the dispatch function and getState function as arguments, giving you access to the Redux store's state and the ability to dispatch additional actions.
+ */
+/**
+ */
+export const bugApiGetBugsWithCache =
+  (options?: QueryOption) =>
+  (dispatch: AppDispatch, getState: () => AppRootState) => {
+    const cacheTTL = options?.cacheTTL || ApiCaching.cacheTTL; // in minutes
+    const { lastFetch } = getState().bugs as BugQueryState;
+    const diff = moment().diff(moment(lastFetch), "minutes");
+
+    if (lastFetch && diff < cacheTTL) return;
+
+    dispatch(bugApiGetBugs());
+  };
 
 export const bugApiGetBugs = () =>
   apiRequestBegan({
