@@ -3,7 +3,7 @@ import { createSelector } from "reselect";
 import type { User, Bug, BugQueryState } from "@/store/types";
 import type { AppState } from "@store/configureStore";
 import { apiRequestBegan } from "@store/api";
-import { ApiRoutes } from "@store/config/api";
+import { ApiRoutes } from "@store/config/api.config";
 
 const API_RESOURCE_NAME = "bugs";
 let lastId = 0;
@@ -36,8 +36,15 @@ const slice = createSlice({
       bugs.list[ix].user = action.payload.userId;
     },
     // API ACTIONS
+    bugApiGetBegan: (bugs) => {
+      bugs.loading = true;
+    },
+    bugApiGetFailed: (bugs) => {
+      bugs.loading = false;
+    },
     bugApiGetSuccess: (bugs, action) => {
       bugs.list = action.payload;
+      bugs.loading = false;
     },
   },
 });
@@ -50,14 +57,16 @@ export default slice.reducer;
 export const bugApiGetBugs = () =>
   apiRequestBegan({
     url: ApiRoutes[API_RESOURCE_NAME].get,
+    onStart: slice.actions.bugApiGetBegan.type,
     // The commented out bellow approach is also valid
     // onSuccess: "bugs/bugApiGetSuccess"
     onSuccess: slice.actions.bugApiGetSuccess.type,
     /**
-     * `onError` has been removed has it can be handled by default by the API Middleware
+     * By default `onError`is handled by default by the API Middleware
      * This is more optimized approach and provides more flexibility in our implementation
      * We can specify `onError` for case where we want to apply a specific side-effect to the error case
      */
+    onError: slice.actions.bugApiGetFailed.type,
   });
 
 // -------------------- SELECTORS -------------------- //

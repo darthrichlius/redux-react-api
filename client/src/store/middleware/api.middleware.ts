@@ -5,6 +5,7 @@ import { AppStore } from "@store/configureStore";
 
 export interface ApiRequestActionPayload {
   url: string;
+  onStart?: string;
   /**
    * `get` is the default method of axios
    * if the member is not provided, axios will default it
@@ -47,8 +48,12 @@ const api: Middleware = (store) => (next) => async (action) => {
      *@todo provide the right signature to avoid type casting on every line
      **/
     if ((action as ApiRequestAction).type === apiRequestBegan.type) {
-      const { url, method, data, onSuccess } = (action as ApiRequestAction)
-        .payload;
+      const { url, method, data, onStart, onSuccess } = (
+        action as ApiRequestAction
+      ).payload;
+
+      if (onStart) store.dispatch({ type: onStart });
+
       const res: AxiosResponse = await axios.request({
         baseURL: import.meta.env.VITE_API_URL,
         url,
