@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createSelector } from "reselect";
-import { type IUser, IBug } from "@/store/types";
-import { type AppState } from "@store/configureStore";
+import type { User, Bug, BugQueryState } from "@/store/types";
+import type { AppState } from "@store/configureStore";
 
 let lastId = 0;
 
@@ -10,10 +10,14 @@ let lastId = 0;
  */
 const slice = createSlice({
   name: "bugs",
-  initialState: [] as IBug[],
+  initialState: {
+    list: [] as Bug[],
+    loading: false,
+    lastFetch: null,
+  } as BugQueryState,
   reducers: {
-    bugAdded: (state, action) => {
-      state.push({
+    bugAdded: (bugs, action) => {
+      bugs.list.push({
         id: ++lastId,
         resolved: false,
         description: action.payload.description,
@@ -22,12 +26,12 @@ const slice = createSlice({
     },
 
     bugResolved: (bugs, action) => {
-      const ix = bugs.findIndex((bug) => bug.id === action.payload.id);
-      bugs[ix].resolved = true;
+      const ix = bugs.list.findIndex((bug) => bug.id === action.payload.id);
+      bugs.list[ix].resolved = true;
     },
     bugAssigned: (bugs, action) => {
-      const ix = bugs.findIndex((bug) => bug.id === action.payload.id);
-      bugs[ix].user = action.payload.userId;
+      const ix = bugs.list.findIndex((bug) => bug.id === action.payload.id);
+      bugs.list[ix].user = action.payload.userId;
     },
   },
 });
@@ -36,23 +40,23 @@ export const { bugAdded, bugResolved, bugAssigned } = slice.actions;
 export default slice.reducer;
 
 export const getUnresolvedBugs = (state: AppState) =>
-  state.entities.bugs.filter((bug) => !bug.resolved);
+  state.entities.bugs.list.filter((bug) => !bug.resolved);
 
 export const getResolvedBugs = createSelector(
   (state: AppState) => state.entities.bugs,
-  (bugs: IBug[]) => bugs.filter((bug) => bug.resolved)
+  (bugs) => bugs.list.filter((bug) => bug.resolved)
 );
 
 export const getUnresolvedBugs2 = createSelector(
   (state: AppState) => state.entities.bugs,
   (state: AppState) => state.entities.projects,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  (bugs, projects) => bugs.filter((item) => !item.resolved)
+  (bugs, projects) => bugs.list.filter((item) => !item.resolved)
 );
 
-export const getBugByUser = (userId: Pick<IUser, "id">) =>
+export const getBugByUser = (userId: Pick<User, "id">) =>
   createSelector(
     (state: AppState) => state.entities.bugs,
     (state: AppState) => state.entities.users,
-    (bugs) => bugs.filter((bug) => bug.user === userId)
+    (bugs) => bugs.list.filter((bug) => bug.user === userId)
   );

@@ -1,17 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { IProject } from "@/store/types";
+import type { Project, ProjectQueryState } from "@/store/types";
 
 let lastId = 0;
 
 const slice = createSlice({
   name: "projects",
-  initialState: [] as IProject[],
+  initialState: {
+    list: [] as Project[],
+    loading: false,
+    lastFetch: null,
+  } as ProjectQueryState,
   // a.k.a Action Handlers
   reducers: {
     // action => Action Handler
-    projectAdded: (state, action) => {
+    projectAdded: (projects, action) => {
       // REMEMBER: This is the payload part
-      state.push({
+      projects.list.push({
         id: ++lastId,
         name: action.payload.name,
       });

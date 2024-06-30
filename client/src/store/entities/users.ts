@@ -1,16 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { IUser } from "@/store/types";
+import type { User, UserQueryState } from "@/store/types";
 
 let lastId = 0;
 
 const slice = createSlice({
   name: "users",
-  initialState: [] as IUser[],
+  initialState: {
+    list: [] as User[],
+    loading: false,
+    lastFetch: null,
+  } as UserQueryState,
   reducers: {
-    userAdded: (state, action) => {
+    userAdded: (users, action) => {
       // This mutable code is allowed because we use createSlice
       // createSlice uses ImmerJS under the hood
-      state.push({
+      users.list.push({
         id: ++lastId,
         name: action.payload.name,
       });
