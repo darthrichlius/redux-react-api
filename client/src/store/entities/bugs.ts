@@ -46,13 +46,14 @@ export const getUnresolvedBugs = (state: IState) =>
   state.entities.bugs.filter((bug) => !bug.resolved);
 
 export const getResolvedBugs = createSelector(
-  (state) => state.entities.bugs,
-  (state) => state.filter((bug) => bug.resolved)
+  (state: IState) => state.entities.bugs,
+  (bugs: IBug[]) => bugs.filter((bug) => bug.resolved)
 );
 
 export const getUnresolvedBugs2 = createSelector(
   (state: IState) => state.entities.bugs,
   (state: IState) => state.entities.projects,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   (bugs, projects) => bugs.filter((item) => !item.resolved)
 );
 
