@@ -24,7 +24,6 @@ const slice = createSlice({
         user: null,
       });
     },
-
     bugResolved: (bugs, action) => {
       const ix = bugs.list.findIndex((bug) => bug.id === action.payload.id);
       bugs.list[ix].resolved = true;
@@ -32,6 +31,10 @@ const slice = createSlice({
     bugAssigned: (bugs, action) => {
       const ix = bugs.list.findIndex((bug) => bug.id === action.payload.id);
       bugs.list[ix].user = action.payload.userId;
+    },
+    // API ACTIONS
+    apiGetBugsSuccess: (bugs, action) => {
+      bugs.list = action.payload;
     },
   },
 });

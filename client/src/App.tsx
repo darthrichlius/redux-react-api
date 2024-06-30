@@ -5,7 +5,7 @@ import { apiRequestBegan } from "@store/api";
 
 const apiActionTest = apiRequestBegan({
   url: "/bugs",
-  onSuccess: "api/getBugsSuccess",
+  onSuccess: "bugs/apiGetBugsSuccess",
   /**
    * `onError` has been removed has it can be handled by default by the API Middleware
    * This is more optimized approach and provides more flexibility in our implementation
