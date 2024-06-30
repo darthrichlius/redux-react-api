@@ -15,6 +15,11 @@ export interface Bug {
   user: User | null;
 }
 
+export type BugRegister = Omit<Bug, "id" | "resolved" | "user"> & {
+  resolved?: boolean;
+  user?: User | null;
+};
+
 /**
  * QueryState approaches is very opinionated and specific to the store context
  * In our case our store management is deeply coupled with API requests
@@ -41,13 +46,13 @@ export interface QueryState {
  * Which is, by experience, an ati-pattern, annoying and cumbersome (hope there are enough adjective for you to feel the pain)
  */
 export interface UserQueryState extends QueryState {
-  list: Array<User>;
+  data: Array<User>;
 }
 
 export interface ProjectQueryState extends QueryState {
-  list: Array<Project>;
+  data: Array<Project>;
 }
 
 export interface BugQueryState extends QueryState {
-  list: Array<Bug>;
+  data: Array<Bug>;
 }

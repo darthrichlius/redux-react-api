@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createSelector } from "reselect";
 import moment from "moment";
-import type { User, Bug, BugQueryState } from "@/store/types";
+import type { User, Bug, BugQueryState, BugRegister } from "@/store/types";
 import type {
   AppDispatch,
   AppRootState,
@@ -19,13 +19,13 @@ let lastId = 0;
 const slice = createSlice({
   name: "bugs",
   initialState: {
-    list: [] as Bug[],
+    data: [] as Bug[],
     loading: false,
     lastFetch: null,
   } as BugQueryState,
   reducers: {
     bugAdded: (bugs, action) => {
-      bugs.list.push({
+      bugs.data.push({
         id: ++lastId,
         resolved: false,
         description: action.payload.description,
@@ -33,24 +33,47 @@ const slice = createSlice({
       });
     },
     bugResolved: (bugs, action) => {
-      const ix = bugs.list.findIndex((bug) => bug.id === action.payload.id);
-      bugs.list[ix].resolved = true;
+      const ix = bugs.data.findIndex((bug) => bug.id === action.payload.id);
+      bugs.data[ix].resolved = true;
     },
     bugAssigned: (bugs, action) => {
-      const ix = bugs.list.findIndex((bug) => bug.id === action.payload.id);
-      bugs.list[ix].user = action.payload.userId;
+      const ix = bugs.data.findIndex((bug) => bug.id === action.payload.id);
+      bugs.data[ix].user = action.payload.userId;
     },
     // API ACTIONS
-    bugApiGetBegan: (bugs) => {
+    bugApiRequestBegan: (bugs) => {
       bugs.loading = true;
     },
-    bugApiGetFailed: (bugs) => {
+    bugApiRequestFailed: (bugs) => {
       bugs.loading = false;
     },
-    bugApiGetSuccess: (bugs, action) => {
-      bugs.list = action.payload;
+    /**
+     * NOTICE
+     * We make sure to clearly define what is in `action.payload.success`
+     * This help understanding the code and facilitate debugging
+     */
+    // ---
+    bugApiListSuccess: (bugs, action) => {
+      const list: Bug[] = action.payload.success;
+      bugs.data = list;
       bugs.loading = false;
       bugs.lastFetch = Date.now();
+    },
+    bugApiAddSuccess: (bugs, action) => {
+      const created: Bug = action.payload.success;
+      bugs.data.push(created);
+      bugs.loading = false;
+    },
+    bugApiResolveSuccess: (bugs, action) => {
+      const updated: Bug = action.payload.success;
+      const ix = bugs.data.findIndex((bug) => bug.id === updated.id);
+      bugs.data[ix].resolved = true;
+      bugs.loading = false;
+    },
+    bugApiDeleteSuccess: (bugs, action) => {
+      const deletedId = parseInt(action.payload.success);
+      bugs.data = bugs.data.filter((bug) => bug.id !== deletedId);
+      bugs.loading = false;
     },
   },
 });
@@ -78,7 +101,7 @@ interface QueryOption {
  *  1.Default caching approach
  *  2. Let's the developer out-out or configure the cache strategy
  */
-export const bugApiGetBugsWithCache =
+export const bugApiListBugsWithCache =
   (options?: QueryOption) =>
   (dispatch: AppDispatch, getState: () => AppRootState) => {
     const cacheTTL = options?.cacheTTL || ApiCaching.cacheTTL; // in minutes
@@ -87,44 +110,76 @@ export const bugApiGetBugsWithCache =
 
     if (lastFetch && diff < cacheTTL) return;
 
-    dispatch(bugApiGetBugs());
+    dispatch(bugApiListBugs());
   };
 
-export const bugApiGetBugs = () =>
+export const bugApiListBugs = () =>
   apiRequestBegan({
-    url: ApiRoutes[API_RESOURCE_NAME].get,
-    onStart: slice.actions.bugApiGetBegan.type,
+    url: ApiRoutes[API_RESOURCE_NAME].list,
+    onStart: slice.actions.bugApiRequestBegan.type,
     // The commented out bellow approach is also valid
-    // onSuccess: "bugs/bugApiGetSuccess"
-    onSuccess: slice.actions.bugApiGetSuccess.type,
+    // onSuccess: "bugs/bugApiListSuccess"
+    onSuccess: slice.actions.bugApiListSuccess.type,
     /**
      * By default `onError`is handled by default by the API Middleware
      * This is more optimized approach and provides more flexibility in our implementation
      * We can specify `onError` for case where we want to apply a specific side-effect to the error case
      */
-    onError: slice.actions.bugApiGetFailed.type,
+    onError: slice.actions.bugApiRequestFailed.type,
+  });
+
+export const bugApiAddBug = (bug: BugRegister) =>
+  apiRequestBegan({
+    url: ApiRoutes[API_RESOURCE_NAME].add!,
+    method: "post",
+    data: bug,
+    onStart: slice.actions.bugApiRequestBegan.type,
+    onSuccess: slice.actions.bugApiAddSuccess.type,
+    onError: slice.actions.bugApiRequestFailed.type,
+  });
+
+export const bugApiResolveBug = (bug: Bug) =>
+  apiRequestBegan({
+    url: ApiRoutes[API_RESOURCE_NAME].resolve!.replace(
+      ":id",
+      `${bug.id}`
+    ).concat("/resolve"),
+    method: "patch",
+    onStart: slice.actions.bugApiRequestBegan.type,
+    onSuccess: slice.actions.bugApiResolveSuccess.type,
+    onError: slice.actions.bugApiRequestFailed.type,
+  });
+
+export const bugApiDeleteBug = (bug: Bug) =>
+  apiRequestBegan({
+    url: ApiRoutes[API_RESOURCE_NAME].resolve!.replace(":id", `${bug.id}`),
+    method: "delete",
+    onStart: slice.actions.bugApiRequestBegan.type,
+    onSuccess: slice.actions.bugApiDeleteSuccess.type,
+    onError: slice.actions.bugApiRequestFailed.type,
   });
 
 // -------------------- SELECTORS -------------------- //
 
 export const getUnresolvedBugs = (state: AppState) =>
-  state.entities.bugs.list.filter((bug) => !bug.resolved);
+  state.entities.bugs.data.filter((bug) => !bug.resolved);
 
 export const getResolvedBugs = createSelector(
   (state: AppState) => state.entities.bugs,
-  (bugs) => bugs.list.filter((bug) => bug.resolved)
+  (bugs) => bugs.data.filter((bug) => bug.resolved)
 );
 
 export const getUnresolvedBugs2 = createSelector(
   (state: AppState) => state.entities.bugs,
   (state: AppState) => state.entities.projects,
+  // The code below demonstrates we can inject data to the function
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  (bugs, projects) => bugs.list.filter((item) => !item.resolved)
+  (bugs, projects) => bugs.data.filter((item) => !item.resolved)
 );
 
 export const getBugByUser = (userId: Pick<User, "id">) =>
   createSelector(
     (state: AppState) => state.entities.bugs,
     (state: AppState) => state.entities.users,
-    (bugs) => bugs.list.filter((bug) => bug.user === userId)
+    (bugs) => bugs.data.filter((bug) => bug.user === userId)
   );

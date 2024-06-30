@@ -1,8 +1,7 @@
 interface ApiRoute {
   get: string;
-  post?: string;
-  put?: string;
-  delete?: string;
+  list: string;
+  [k: string]: string;
 }
 interface ApiCaching {
   cacheTTL: number; // in minutes
@@ -16,7 +15,11 @@ const bugResourceBaseUrl = "/bugs";
 
 export const ApiRoutes: ApiRoutes = {
   bugs: {
-    get: bugResourceBaseUrl,
+    get: bugResourceBaseUrl.concat("/:id"),
+    list: bugResourceBaseUrl,
+    add: bugResourceBaseUrl,
+    resolve: bugResourceBaseUrl.concat("/:id"),
+    delete: bugResourceBaseUrl.concat("/:id"),
   },
 };
 

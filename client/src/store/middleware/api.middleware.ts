@@ -3,6 +3,16 @@ import { Middleware, type Action } from "redux";
 import { apiRequestBegan, apiRequestFailed, apiRequestSuccess } from "../api";
 import { AppStore } from "@store/configureStore";
 
+export interface ApiSuccessResponse<T> {
+  status: boolean;
+  data: T | unknown;
+}
+
+export interface ApiFailedResponse<T> {
+  status: boolean;
+  error: T | unknown;
+}
+
 export interface ApiRequestActionPayload {
   url: string;
   onStart?: string;
@@ -23,13 +33,13 @@ export interface ApiRequestActionPayload {
   onError?: string;
 }
 
-export interface ApiResponseSuccessActionPayload {
+export interface ApiResponseSuccessActionPayload<T> {
   // @todo IMPROVEMENT: Provide a normalized APIResponse format
-  data: AxiosResponse<unknown>; //ESLint doesn't like `any`
+  success: AxiosResponse<ApiSuccessResponse<T>>; //ESLint doesn't like `any`
 }
 
-export interface ApiResponseFailedActionPayload {
-  error: AxiosError | string;
+export interface ApiResponseFailedActionPayload<T> {
+  error: AxiosError<ApiFailedResponse<T>> | string;
 }
 
 export interface ApiRequestAction extends Action<string> {
@@ -73,7 +83,7 @@ const api: Middleware = (store) => (next) => async (action) => {
     handleOnError({
       store: store as AppStore,
       onError: _onError,
-      error: err as AxiosError,
+      error: err as ApiFailedResponse<unknown>,
     });
   }
 };
@@ -85,20 +95,20 @@ const handleOnSuccess = ({
 }: {
   store: AppStore;
   onSuccess?: string;
-  data: AxiosResponse;
+  data: ApiSuccessResponse<unknown>;
 }): void => {
   if (!onSuccess) {
-    // General error cases
+    // General success cases
     store.dispatch(
       apiRequestSuccess({
-        data,
+        success: data.data,
       })
     );
   } else {
     store.dispatch({
       type: onSuccess,
       payload: {
-        data,
+        success: data.data,
       },
     });
   }
@@ -111,7 +121,7 @@ const handleOnError = ({
 }: {
   store: AppStore;
   onError?: string;
-  error: AxiosError;
+  error: ApiFailedResponse<unknown>;
 }): void => {
   /**
    * We extract only the error message as one of the rules of using Redux is "Do Not Put Non-Serializable Values in State or Actions"
@@ -124,7 +134,7 @@ const handleOnError = ({
    * @see https://redux.js.org/style-guide/#do-not-put-non-serializable-values-in-state-or-actions
    * @see https://redux-toolkit.js.org/usage/usage-guide#working-with-non-serializable-data
    */
-  const errorMessage = error.message;
+  const errorMessage = "";
 
   // General error cases
   if (!onError) {

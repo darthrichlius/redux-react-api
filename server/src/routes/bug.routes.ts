@@ -5,7 +5,10 @@ const router = Router();
 
 router.get("/", async (_req: Request, res: Response) => {
   const bugs = await prismaClient.bug.findMany();
-  res.json(bugs);
+  res.json({
+    status: true,
+    data: bugs,
+  });
 });
 
 router.patch("/:id/resolve", async (req: Request, res: Response) => {
@@ -22,7 +25,10 @@ router.patch("/:id/resolve", async (req: Request, res: Response) => {
         resolved: true,
       },
     });
-    res.json(updated);
+    res.json({
+      status: true,
+      data: updated,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({
@@ -37,10 +43,14 @@ router.post("/", async (req: Request, res: Response) => {
     const added = await prismaClient.bug.create({
       data: bug,
     });
-    res.json(added);
+    res.json({
+      status: true,
+      data: added,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({
+      status: false,
       error: (err as Error).message,
     });
   }
@@ -57,10 +67,14 @@ router.delete("/:id", async (req: Request, res: Response) => {
         id: _id,
       },
     });
-    res.sendStatus(200);
+    res.json({
+      status: true,
+      data: _id,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({
+      status: false,
       error: (err as Error).message,
     });
   }

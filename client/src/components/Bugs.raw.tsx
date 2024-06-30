@@ -6,7 +6,7 @@
 
 import { useContext, useEffect, useState } from "react";
 import { StoreContext } from "@/context/storeContext";
-import { bugApiGetBugs } from "@/store/entities/bugs";
+import { bugApiListBugs } from "@/store/entities/bugs";
 import type { AppStore } from "@store/configureStore";
 import { Bug } from "@store/types";
 
@@ -23,7 +23,7 @@ export default function BugsRaw() {
       setLoading(loading);
     });
 
-    store.dispatch(bugApiGetBugs());
+    store.dispatch(bugApiListBugs());
 
     /**
      * The clean-up function is important to prevent the following:
