@@ -2,7 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 import { createSelector } from "reselect";
 import type { User, Bug, BugQueryState } from "@/store/types";
 import type { AppState } from "@store/configureStore";
+import { apiRequestBegan } from "@store/api";
+import { ApiRoutes } from "@store/config/api";
 
+const API_RESOURCE_NAME = "bugs";
 let lastId = 0;
 
 /**
@@ -33,7 +36,7 @@ const slice = createSlice({
       bugs.list[ix].user = action.payload.userId;
     },
     // API ACTIONS
-    apiGetBugsSuccess: (bugs, action) => {
+    bugApiGetSuccess: (bugs, action) => {
       bugs.list = action.payload;
     },
   },
@@ -41,6 +44,23 @@ const slice = createSlice({
 
 export const { bugAdded, bugResolved, bugAssigned } = slice.actions;
 export default slice.reducer;
+
+// -------------------- ACTION CREATORS -------------------- //
+
+export const bugApiGetBugs = () =>
+  apiRequestBegan({
+    url: ApiRoutes[API_RESOURCE_NAME].get,
+    // The commented out bellow approach is also valid
+    // onSuccess: "bugs/bugApiGetSuccess"
+    onSuccess: slice.actions.bugApiGetSuccess.type,
+    /**
+     * `onError` has been removed has it can be handled by default by the API Middleware
+     * This is more optimized approach and provides more flexibility in our implementation
+     * We can specify `onError` for case where we want to apply a specific side-effect to the error case
+     */
+  });
+
+// -------------------- SELECTORS -------------------- //
 
 export const getUnresolvedBugs = (state: AppState) =>
   state.entities.bugs.list.filter((bug) => !bug.resolved);
