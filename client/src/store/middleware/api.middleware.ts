@@ -29,7 +29,7 @@ export interface ApiResponseSuccessActionPayload {
 }
 
 export interface ApiResponseFailedActionPayload {
-  error: AxiosError;
+  error: AxiosError | string;
 }
 
 export interface ApiRequestAction extends Action<string> {
@@ -113,10 +113,23 @@ const handleOnError = ({
   onError?: string;
   error: AxiosError;
 }): void => {
+  /**
+   * We extract only the error message as one of the rules of using Redux is "Do Not Put Non-Serializable Values in State or Actions"
+   * If we don't adhere to this approach we will end up with an error.
+   * To make it short, their main motive is that ACTION SHOULD BE SERIALIZABLE
+   * (REPRODUCE: git checkout to the direct previous commit, access the website and check the console error)
+   *
+   * Bellow is further readings
+   * @see https://redux.js.org/faq/actions#why-should-type-be-a-string-why-should-my-action-types-be-constants
+   * @see https://redux.js.org/style-guide/#do-not-put-non-serializable-values-in-state-or-actions
+   * @see https://redux-toolkit.js.org/usage/usage-guide#working-with-non-serializable-data
+   */
+  const errorMessage = error.message;
+
   // General error cases
   if (!onError) {
     // @todo make sure the result format is properly related to `ApiActionPayload`
-    store.dispatch(apiRequestFailed({ error }));
+    store.dispatch(apiRequestFailed({ error: errorMessage }));
   } else {
     /**
      * Specific error cases
@@ -125,7 +138,7 @@ const handleOnError = ({
     store.dispatch({
       type: onError,
       payload: {
-        error,
+        error: errorMessage,
       },
     });
   }
