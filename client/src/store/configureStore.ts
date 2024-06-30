@@ -19,8 +19,10 @@ export default function () {
   return store;
 }
 
+export type AppStore = typeof store;
 export type AppDispatch = typeof store.dispatch;
-export type RootState = ReturnType<typeof store.getState>;
-export interface IState {
-  entities: RootState;
+// We should avoid `RootState` naming to prevent ambiguous situation, as redux already has its own `RootState`declaration
+export type AppRootState = ReturnType<typeof store.getState>;
+export interface AppState {
+  entities: AppRootState;
 }

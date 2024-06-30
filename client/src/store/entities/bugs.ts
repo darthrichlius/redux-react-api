@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createSelector } from "reselect";
 import { type IUser } from "./users";
-import { IState } from "@store/configureStore";
+import { type AppState } from "@store/configureStore";
 
 export interface IBug {
   id: number;
@@ -42,24 +42,24 @@ const slice = createSlice({
 export const { bugAdded, bugResolved, bugAssigned } = slice.actions;
 export default slice.reducer;
 
-export const getUnresolvedBugs = (state: IState) =>
+export const getUnresolvedBugs = (state: AppState) =>
   state.entities.bugs.filter((bug) => !bug.resolved);
 
 export const getResolvedBugs = createSelector(
-  (state: IState) => state.entities.bugs,
+  (state: AppState) => state.entities.bugs,
   (bugs: IBug[]) => bugs.filter((bug) => bug.resolved)
 );
 
 export const getUnresolvedBugs2 = createSelector(
-  (state: IState) => state.entities.bugs,
-  (state: IState) => state.entities.projects,
+  (state: AppState) => state.entities.bugs,
+  (state: AppState) => state.entities.projects,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   (bugs, projects) => bugs.filter((item) => !item.resolved)
 );
 
 export const getBugByUser = (userId: Pick<IUser, "id">) =>
   createSelector(
-    (state: IState) => state.entities.bugs,
-    (state: IState) => state.entities.users,
+    (state: AppState) => state.entities.bugs,
+    (state: AppState) => state.entities.users,
     (bugs) => bugs.filter((bug) => bug.user === userId)
   );
