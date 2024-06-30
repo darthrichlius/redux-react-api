@@ -26,18 +26,23 @@ export interface ApiAction extends Action<string> {
 const api: Middleware = (store) => (next) => async (action) => {
   try {
     /**
+     * If we don't do this, we will not be able to see API action in the redux development tool
+     * Yet, we only process API actions
+     */
+    next(action);
+    /**
      *@todo provide the right signature to avoid type casting on every line
      **/
-    if ((action as ApiAction).type !== "apiRequestBegan") return next(action);
-
-    const { url, method, data, onSuccess } = (action as ApiAction).payload;
-    const res: AxiosResponse = await axios.request({
-      baseURL: import.meta.env.VITE_API_URL,
-      url,
-      method,
-      data,
-    });
-    store.dispatch({ type: onSuccess, payload: res.data });
+    if ((action as ApiAction).type === "apiRequestBegan") {
+      const { url, method, data, onSuccess } = (action as ApiAction).payload;
+      const res: AxiosResponse = await axios.request({
+        baseURL: import.meta.env.VITE_API_URL,
+        url,
+        method,
+        data,
+      });
+      store.dispatch({ type: onSuccess, payload: res.data });
+    }
   } catch (err) {
     store.dispatch({
       type: (action as ApiAction).payload.onError,
