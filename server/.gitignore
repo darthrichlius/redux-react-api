@@ -2,3 +2,7 @@ node_modules
 .env
 dist
 data
+
+# Due to the fact we recreate the database at each start
+# The folder is constantly removed and recreated troubling the git management
+prisma/migrations
